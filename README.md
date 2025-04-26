@@ -1,70 +1,93 @@
 
 ---
 
-# 📊 **Dynamic Report Generator Service**
+# **Dynamic Report Generator Service**
 
-Welcome to the **Dynamic Report Generator**, a microservice crafted using Django to simplify large-scale CSV data processing. This service empowers users to upload datasets, define transformation logic through JSON/YAML rules, and generate insightful reports—either on-demand or via scheduled tasks. Background processing is seamlessly handled by Celery with Redis as the broker, ensuring smooth performance even for heavy workloads.
-
----
-
-## ⚡️ **Core Capabilities**
-
-- 📂 Upload CSV datasets (input & reference files)
-- ⚙️ Define custom transformation rules using JSON or YAML
-- 🚀 Trigger instant report generation through RESTful APIs
-- 📥 Securely download generated reports in CSV format
-- ⏰ Automate report generation using cron-based schedules
-- 🔒 Enforced JWT authentication across all endpoints
-- 🛠️ Powered by DRF, Celery, Redis, and Docker for scalability
+ **Dynamic Report Generator**, This is a microservice crafted using Django to simplify large-scale CSV data processing. This service empowers users to upload datasets, define transformation logic through JSON/YAML rules, and generate insightful reports—either on-demand or via scheduled tasks. Background processing is seamlessly handled by Celery with Redis as the broker, ensuring smooth performance even for heavy workloads.
 
 ---
 
-## 🛠️ **Technology Overview**
+##  **Core Capabilities**
 
-This service leverages a modern, containerized architecture designed for scalability, maintainability, and ease of deployment.
-
-| **Component**      | **Technology Stack**                 |
-|--------------------|--------------------------------------|
-| Programming Lang.  | Python 3.11                          |
-| Web Framework      | Django 4.x + Django REST Framework   |
-| Background Tasks   | Celery                               |
-| Task Broker        | Redis                                |
-| Scheduling         | django-celery-beat (Cron Jobs)       |
-| Authentication     | JWT via `djangorestframework-simplejwt` |
-| Database (Optional)| PostgreSQL                           |
-| Containerization   | Docker & Docker Compose              |
-| Testing            | Django TestCase + DRF APITestCase    |
+- Upload CSV datasets (input & reference files)
+- Define custom transformation rules using JSON or YAML
+- Trigger instant report generation through RESTful APIs
+- Securely download generated reports in CSV format
+- Automate report generation using cron-based schedules
+- Enforced JWT authentication across all endpoints
+- Powered by DRF, Celery, Redis, and Docker for scalability
 
 ---
 
-## 🌐 **Service Blueprint**
+## **Technology Overview**
+
+This service leverages the following technologies:
+
+Programming Language: Python 3.11
+
+Core Frameworks: Django 4.x, Django REST Framework (DRF)
+
+Data Processing: Pandas for fast and flexible data transformation
+
+Background Jobs: Celery (distributed task queue)
+
+Message Broker: Redis
+
+Scheduling: django-celery-beat (cron-style job management)
+
+Authentication: JSON Web Tokens via djangorestframework-simplejwt
+
+Containerization: Docker and Docker Compose for portability
+
+Testing Tools: Django’s TestCase and DRF’s APITestCase for robust test coverage
+
+Database (Optional): PostgreSQL (for persistent metadata or configuration)
+
+---
+
+##  **Service Blueprint**
 
 Visualizing how components interact within the system:
 
 ```
-+-------------+          API Requests          +--------------------+
-|   CLIENT    |  ───────────────────────────▶  |   Django + DRF     |
-+-------------+                                +--------------------+
-                                                      │
-                                                      ▼
-                                        +------------------------+
-                                        |   Redis (Task Broker)  |
-                                        +------------------------+
-                                                      │
-                                                      ▼
-                                             +----------------+
-                                             |   Celery Worker |
-                                             +----------------+
-                                                      │
-                                                      ▼
-                                         +-----------------------+
-                                         |   File Transformation |
-                                         +-----------------------+
-                                                      │
-                                                      ▼
-                                            +-----------------+
-                                            |  Report Output  |
-                                            +-----------------+
++-------------+                                                        
+|   CLIENT    |                                                        
++-------------+                                                        
+       │                                                              
+       ▼                                                              
++------------------------------------------------+                    
+|              Django + DRF (API Layer)          |   ◄── Authentication, Validation, Routing
++------------------------------------------------+                    
+       │                                                              
+       ▼                                                              
++--------------------+        +--------------------+                  
+|   Redis (Broker)   |        |   Database (DB)    |   ◄── For storing metadata, task status, etc.
++--------------------+        +--------------------+                  
+       │                                                              
+       ▼                                                              
+          +-----------------------------------------+                 
+          |            Celery Worker                |   ◄── Async Task Execution Subsystem
+          +-----------------------------------------+                 
+                              │                                        
+          +-----------------------------------------+                 
+          |       File Transformation Subsystem     |                 
+          |  (Parsing, Validation, Conversion, etc) |                 
+          +-----------------------------------------+                 
+                              │                                        
+          +-----------------------------------------+                 
+          |         Report Generation Subsystem     |                 
+          |     (PDF, CSV, JSON, etc. Outputs)      |                 
+          +-----------------------------------------+                 
+                              │                                        
+                      +------------------+                            
+                      |  Report Storage  |   ◄── (S3, GCP, Local FS)  
+                      +------------------+                            
+                              │                                        
+                              ▼                                        
+                      +------------------+                            
+                      |  Client Download |   ◄── (Link/Direct Access)
+                      +------------------+                            
+
 ```
 
 ---
@@ -73,7 +96,7 @@ Visualizing how components interact within the system:
 
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/PrabhatTheCoder/natwest_assignment.git
+git clone https://github.com/shrey1010/natwest_assignment.git
 cd natwest_assignment
 ```
 
@@ -251,15 +274,6 @@ This will auto-trigger report generation every 10 minutes.
 
 Ensure valid tokens and correct file formats to avoid common issues.
 
----
-
-## 📎 **Resources & Tools**
-
-- **Example Files:** [Google Drive Link](https://drive.google.com/drive/folders/1CT6r7pEOywQODt2XgZgBb5-ZQNjmB7en?usp=drive_link)
-- **Postman Collection:** [Access Here](https://survey-quiz.postman.co/workspace/Team-Workspace~0e64a07b-e68d-43f5-83f3-428269c455a1/collection/34406608-524d8bb9-971e-4230-a585-3f18338e6c7d?action=share&creator=34406608&active-environment=34406608-661818f6-2565-4bad-89f2-7df328911bd8)
-
----
-
 ## 🚧 **Example Usage**
 
 ### ▶️ User Registration
@@ -277,13 +291,4 @@ curl -X POST http://0.0.0.0:8000/api/generate-report/ \
 -F "reference=@reference.csv"
 ```
 
----
-
-## 🎯 **Summary**
-
-This microservice is tailored for teams and organizations needing robust, flexible, and automated data reporting solutions. Whether processing large datasets or automating periodic report generation, this service ensures secure, scalable, and efficient handling of your reporting workflows.
-
-For any issues, contributions, or feature requests, feel free to fork the repository or raise an issue!
-
----
 
