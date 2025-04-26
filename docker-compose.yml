@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: natwest_web
+    command: sh entrypoint.sh
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/natwest
+      - ./media:/natwest/media
+    depends_on:
+      - db
+      - redis
+    environment:
+      POSTGRES_USER: natwest_user
+      POSTGRES_PASSWORD: natwest_password
+      POSTGRES_DB: natwest_db
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+
+  db:
+    image: postgres:15
+    container_name: postgres_natwest
+    environment:
+      POSTGRES_USER: natwest_user
+      POSTGRES_PASSWORD: natwest_password
+      POSTGRES_DB: natwest_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: redis_natwest
+    ports:
+      - "6379:6379"
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery_worker
+    command: celery -A natwest worker --loglevel=info
+    volumes:
+      - .:/natwest
+    depends_on:
+      - redis
+      - db
+    environment:
+      POSTGRES_USER: natwest_user
+      POSTGRES_PASSWORD: natwest_password
+      POSTGRES_DB: natwest_db
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery_beat
+    command: celery -A natwest beat --loglevel=info
+    volumes:
+      - .:/natwest
+    depends_on:
+      - redis
+      - db
+      - web 
+    environment:
+      POSTGRES_USER: natwest_user
+      POSTGRES_PASSWORD: natwest_password
+      POSTGRES_DB: natwest_db
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+
+volumes:
+  postgres_data:

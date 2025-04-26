@@ -1,0 +1,9 @@
+[run]
+source = 
+    app
+    natwest
+    users
+
+[report]
+omit =
+    */tests/*

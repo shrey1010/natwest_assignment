@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+
+# Environment files
+.env
+
+# Virtual environment directories
+bin/
+lib/
+lib64/
+include/
+venv/
+env/
+
+# Coverage and test results
+htmlcov/
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Django specific
+**/migrations/
+!**/migrations/__init__.py
+/media/
+/staticfiles_build/
+
+# PyCharm/VSCode
+.idea/
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Configs and secrets
+app/transformation/configs/*.json
+app/transformation/configs/*.yaml
